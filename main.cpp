@@ -22,6 +22,8 @@ MA 02110-1301, USA.
 #include <filesystem>
 #include <future>
 #include <stdexcept>
+/*#include <ghostscript/iapi.h>
+#include <ghostscript/ierrors.h>*/
 
 void optimizePdf(const std::string &pdfPath);
 
@@ -29,14 +31,16 @@ int main(int argc, char *argv[]) {
   if (argc < 2) { std::cerr << "You must provide folder with *pdf file(s) in it. Exiting." << std::endl; return EXIT_FAILURE; }
   std::vector<std::string> allPdfFiles;
   std::vector<std::future<void>> futures;
-  for (const auto& entry : std::filesystem::directory_iterator(argv[1])) {
+  for (const auto &entry : std::filesystem::directory_iterator(argv[1])) {
     if (entry.path().has_extension() && entry.path().extension() == ".pdf") { allPdfFiles.emplace_back(entry.path().string()); } }
   for (const auto &currentPdf : allPdfFiles) { futures.emplace_back(std::async(std::launch::async, optimizePdf, currentPdf)); }
-  for (auto& future : futures) { future.get(); }
+  for (auto &future : futures) { future.get(); }
   return EXIT_SUCCESS;
 }
 
 void optimizePdf(const std::string &pdfPath) {
+  /*void *gs_instance = nullptr;
+  if (gsapi_new_instance(&gs_instance, nullptr) < 0 || !gs_instance) { std::cerr << "Failed to create Ghostscript instance.\n" << std::endl; return; }*/
   std::filesystem::path outPath = pdfPath;
   outPath.replace_filename("optimized_" + outPath.filename().string());
   std::vector<std::string> cmd = {
@@ -64,6 +68,9 @@ void optimizePdf(const std::string &pdfPath) {
     for (const auto &str : cmd) { cmdStr += str + " "; }
     std::cout << "Please wait until we convert the requested *.pdf files." << std::endl;
     std::system(cmdStr.c_str());
-    std::cout << "Done" << std::endl;
+    /*if (gsapi_init_with_args(gs_instance, gs_args.size(), const_cast<char**>(gs_args.data())) < 0) { std::cerr << "Ghostscript failed.\n" << std::endl; }
+    gsapi_exit(gs_instance);
+    gsapi_delete_instance(gs_instance);*/
+    std::cout << "Done." << std::endl;
   } catch (const std::exception &e) { std::cerr << "Error: " << e.what() << std::endl; return; }
 }
