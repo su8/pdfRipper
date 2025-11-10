@@ -1,4 +1,4 @@
-[![C/C++ CI](https://github.com/su8/pdfRipper/actions/workflows/c-cpp.yml/badge.svg?branch=main)](https://github.com/su8/pdfRipper/actions/workflows/c-cpp.yml)
+[![C/C++ CI](https://github.com/su8/pdfRipper/actions/workflows/c-cpp.yml/badge.svg?branch=main)](https://github.com/su8/pdfRipper/actions/workflows/c-cpp.yml) [![flawfinder](https://github.com/su8/pdfRipper/actions/workflows/flawfinder.yml/badge.svg?branch=main)](https://github.com/su8/pdfRipper/actions/workflows/flawfinder.yml)
 
 #### Convert and reduce pdf size while not losing quality. pdfRipper searches for all *.pdf files in the provided folder and compresses them in a row, it creates a new files with starting "optimized_" in their names. The program uses threading and will convert all *.pdf files in other threads.
 
