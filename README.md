@@ -1,6 +1,6 @@
 [![C/C++ CI](https://github.com/su8/pdfRipper/actions/workflows/c-cpp.yml/badge.svg?branch=main)](https://github.com/su8/pdfRipper/actions/workflows/c-cpp.yml)
 
-#### Convert and reduce pdf size while not losing quality. pdfRipper searches for all *.pdf files in the provided folder and compresses them in a row, it creates a new files with starting "optimized_" in their names. The program uses threading and will convert all *pdf files in other threads.
+#### Convert and reduce pdf size while not losing quality. pdfRipper searches for all *.pdf files in the provided folder and compresses them in a row, it creates a new files with starting "optimized_" in their names. The program uses threading and will convert all *.pdf files in other threads.
 
 
 ## Installation
@@ -82,6 +82,6 @@ In [Visual Studio Code Editor](https://code.visualstudio.com/download), go to **
 
 To convert some pdf files with the `pdfRipper.bat` script, copy the name of the destination folder or once the script is started you can provide the desired folder, but you will have to use `Double Quotes` if the folder has spaces in it's name, after that right click it in the opened CMD window and press enter.
 
-### To compile the main.cpp press **CTRL** + **SHIFT** + **B** , then from the same Desktop folder start the `kurger_cli.bat` script. Now you can delete the "kurger_cli.exe" file
+### To compile the main.cpp press **CTRL** + **SHIFT** + **B** , then from the same Desktop folder start the `pdfRipper.bat` script. Now you can delete the "main.exe" file
 
 Optioanlly if you want to play around with the code from VSCode's console -- wait until it compiles, after that press **CTRL** + **\`** and paste this `cp -r C:\Users\YOUR_USERNAME_GOES_HERE\Desktop\main.exe C:\MingW\bin;cd C:\MingW\bin;.\main.exe C:\`
