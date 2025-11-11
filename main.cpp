@@ -56,6 +56,7 @@ void optimizePdf(const std::string &pdfPath) {
         "-dQUIET",
         "-dCompatibilityLevel=1.7",
         "-dCompressFonts=true",
+        "-dSubsetFonts=true",
         "-dPDFSETTINGS=/screen",
         "-sBandListStorage=memory",
         "-dBufferSpace=99000",
