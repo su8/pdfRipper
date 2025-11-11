@@ -16,16 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <filesystem>
 #include <future>
 #include <stdexcept>
-/*#include <ghostscript/iapi.h>
-#include <ghostscript/ierrors.h>*/
 
-void optimizePdf(const std::string &pdfPath);
+static void optimizePdf(const std::string &pdfPath);
 
 int main(int argc, char *argv[]) {
   if (argc < 2) { std::cerr << "You must provide folder with *pdf file(s) in it. Exiting." << std::endl; return EXIT_FAILURE; }
@@ -38,40 +37,20 @@ int main(int argc, char *argv[]) {
   return EXIT_SUCCESS;
 }
 
-void optimizePdf(const std::string &pdfPath) {
-  /*void *gs_instance = nullptr;
-  if (gsapi_new_instance(&gs_instance, nullptr) < 0 || !gs_instance) { std::cerr << "Failed to create Ghostscript instance.\n" << std::endl; return; }*/
-  std::filesystem::path outPath = pdfPath;
-  outPath.replace_filename("optimized_" + outPath.filename().string());
-  std::vector<std::string> cmd = {
 #ifdef _WIN32
 #define GS "C:\\gs\\bin\\gswin64c.exe"
 #else
 #define GS "gs"
 #endif /* _WIN32 */
-        GS,
-        "-sDEVICE=pdfwrite",
-        "-dNOPAUSE",
-        "-dBATCH",
-        "-dQUIET",
-        "-dCompatibilityLevel=1.7",
-        "-dCompressFonts=true",
-        "-dSubsetFonts=true",
-        "-dPDFSETTINGS=/screen",
-        "-sBandListStorage=memory",
-        "-dBufferSpace=99000",
-        "-dNumRenderingThreads=8",
-        "-sOutputFile=" + outPath.string(),
-        pdfPath
-  };
+
+static void optimizePdf(const std::string &pdfPath) {
+  std::filesystem::path outPath = pdfPath;
+  outPath.replace_filename("optimized_" + outPath.filename().string());
+  char params[4096] = GS " -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dQUIET -dCompatibilityLevel=1.7 -dCompressFonts=true -dSubsetFonts=true -dPDFSETTINGS=/screen -sBandListStorage=memory -dBufferSpace=99000 -dNumRenderingThreads=8 -sOutputFile=";
+  snprintf(params, sizeof(params), "%s%s %s", params, outPath.string().c_str(), pdfPath.c_str());
   try {
-    std::string cmdStr;
-    for (const auto &str : cmd) { cmdStr += str + " "; }
     std::cout << "Please wait until we convert the requested *.pdf files." << std::endl;
-    std::system(cmdStr.c_str());
-    /*if (gsapi_init_with_args(gs_instance, gs_args.size(), const_cast<char**>(gs_args.data())) < 0) { std::cerr << "Ghostscript failed.\n" << std::endl; }
-    gsapi_exit(gs_instance);
-    gsapi_delete_instance(gs_instance);*/
+    std::system(params);
     std::cout << "Done." << std::endl;
   } catch (const std::exception &e) { std::cerr << "Error: " << e.what() << std::endl; return; }
 }
