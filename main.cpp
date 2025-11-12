@@ -41,15 +41,18 @@ int main(int argc, char *argv[]) {
 
 #ifdef _WIN32
 #define GS "C:\\gs\\bin\\gswin64c.exe"
+#define SEP "\\"
 #else
 #define GS "gs"
+#define SEP "/"
 #endif /* _WIN32 */
 
 static void optimizePdf(const std::string &pdfPath) {
   fs::path outPath = pdfPath;
   if (outPath.stem().filename().string().starts_with("optimized_")) { std::cout << pdfPath << " already exists. Nothing to be done." << std::endl; return; }
   outPath.replace_filename("optimized_" + outPath.filename().string());
-  if (fs::exists(outPath) && fs::is_regular_file(outPath)) { return; }
+  std::string checkIfConverted = fs::current_path().string() + static_cast<std::string>(SEP) + outPath.filename().string();
+  if ((fs::exists(outPath) && fs::is_regular_file(outPath)) || (fs::exists(checkIfConverted) && fs::is_regular_file(checkIfConverted))) { std::cout << fs::current_path().string() << SEP << outPath.filename().string() << " alredy exists. Nothing to be done." << std::endl; return; }
   char params[4096] = GS " -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dQUIET -dCompatibilityLevel=1.7 -dCompressFonts=true -dSubsetFonts=true -dPDFSETTINGS=/printer -sBandListStorage=memory -dBufferSpace=99000 -dNumRenderingThreads=8 -sOutputFile=";
   snprintf(params, sizeof(params), "%s%s %s", params, outPath.filename().string().c_str(), pdfPath.c_str());
   try {
