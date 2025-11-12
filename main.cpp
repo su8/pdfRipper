@@ -26,11 +26,13 @@ MA 02110-1301, USA.
 
 static void optimizePdf(const std::string &pdfPath);
 
+namespace fs = std::filesystem;
+
 int main(int argc, char *argv[]) {
   if (argc < 2) { std::cerr << "You must provide folder with *pdf file(s) in it. Exiting." << std::endl; return EXIT_FAILURE; }
   std::vector<std::string> allPdfFiles;
   std::vector<std::future<void>> futures;
-  for (const auto &entry : std::filesystem::directory_iterator(argv[1])) {
+  for (const auto &entry : fs::directory_iterator(argv[1])) {
     if (entry.path().has_extension() && entry.path().extension() == ".pdf") { allPdfFiles.emplace_back(entry.path().string()); } }
   for (const auto &currentPdf : allPdfFiles) { futures.emplace_back(std::async(std::launch::async, optimizePdf, currentPdf)); }
   for (auto &future : futures) { future.get(); }
@@ -44,9 +46,10 @@ int main(int argc, char *argv[]) {
 #endif /* _WIN32 */
 
 static void optimizePdf(const std::string &pdfPath) {
-  std::filesystem::path outPath = pdfPath;
+  fs::path outPath = pdfPath;
   if (outPath.stem().filename().string().starts_with("optimized_")) { std::cout << pdfPath << " already exists. Nothing to be done." << std::endl; return; }
   outPath.replace_filename("optimized_" + outPath.filename().string());
+  if (fs::exists(outPath) && fs::is_regular_file(outPath)) { return; }
   char params[4096] = GS " -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dQUIET -dCompatibilityLevel=1.7 -dCompressFonts=true -dSubsetFonts=true -dPDFSETTINGS=/screen -sBandListStorage=memory -dBufferSpace=99000 -dNumRenderingThreads=8 -sOutputFile=";
   snprintf(params, sizeof(params), "%s%s %s", params, outPath.string().c_str(), pdfPath.c_str());
   try {
