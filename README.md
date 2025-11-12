@@ -16,7 +16,7 @@ make -j8 # 8 cores/threads to use in parallel compile
 sudo/doas make install
 
 # to uninstall it
-sudo make uninstall
+sudo/doas make uninstall
 ```
 
 ---
@@ -85,3 +85,7 @@ To convert some pdf files with the `pdfRipper.bat` script, copy the name of the 
 ### To compile the main.cpp press **CTRL** + **SHIFT** + **B** , then from the same Desktop folder start the `pdfRipper.bat` script. Now you can delete the "main.exe" file
 
 Optioanlly if you want to play around with the code from VSCode's console -- wait until it compiles, after that press **CTRL** + **\`** and paste this `cp -r C:\Users\YOUR_USERNAME_GOES_HERE\Desktop\main.exe C:\MingW\bin;cd C:\MingW\bin;.\main.exe C:\`
+
+---
+
+There is a test file here in the repository that you can convert yourself and see the program in action.
