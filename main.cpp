@@ -51,7 +51,7 @@ static void optimizePdf(const std::string &pdfPath) {
   outPath.replace_filename("optimized_" + outPath.filename().string());
   if (fs::exists(outPath) && fs::is_regular_file(outPath)) { return; }
   char params[4096] = GS " -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dQUIET -dCompatibilityLevel=1.7 -dCompressFonts=true -dSubsetFonts=true -dPDFSETTINGS=/screen -sBandListStorage=memory -dBufferSpace=99000 -dNumRenderingThreads=8 -sOutputFile=";
-  snprintf(params, sizeof(params), "%s%s %s", params, outPath.string().c_str(), pdfPath.c_str());
+  snprintf(params, sizeof(params), "%s%s %s", params, outPath.filename().string().c_str(), pdfPath.c_str());
   try {
     std::cout << "Please wait until we convert the requested " << pdfPath << " file." << std::endl;
     std::system(params);
