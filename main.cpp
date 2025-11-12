@@ -45,11 +45,12 @@ int main(int argc, char *argv[]) {
 
 static void optimizePdf(const std::string &pdfPath) {
   std::filesystem::path outPath = pdfPath;
+  if (outPath.stem().filename().string().starts_with("optimized_")) { std::cout << pdfPath << " already exists. Nothing to be done." << std::endl; return; }
   outPath.replace_filename("optimized_" + outPath.filename().string());
   char params[4096] = GS " -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dQUIET -dCompatibilityLevel=1.7 -dCompressFonts=true -dSubsetFonts=true -dPDFSETTINGS=/screen -sBandListStorage=memory -dBufferSpace=99000 -dNumRenderingThreads=8 -sOutputFile=";
   snprintf(params, sizeof(params), "%s%s %s", params, outPath.string().c_str(), pdfPath.c_str());
   try {
-    std::cout << "Please wait until we convert the requested *.pdf files." << std::endl;
+    std::cout << "Please wait until we convert the requested " << pdfPath << " file." << std::endl;
     std::system(params);
     std::cout << "Done." << std::endl;
   } catch (const std::exception &e) { std::cerr << "Error: " << e.what() << std::endl; return; }
