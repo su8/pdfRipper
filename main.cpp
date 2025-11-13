@@ -32,7 +32,8 @@ int main(int argc, char *argv[]) {
   if (argc < 2) { std::cerr << "You must provide folder with *pdf file(s) in it. Exiting." << std::endl; return EXIT_FAILURE; }
   std::vector<std::string> allPdfFiles;
   std::vector<std::future<void>> futures;
-  for (const auto &entry : fs::directory_iterator(argv[1])) {
+  fs::path curFolder = (argv[1][0] == '.') ? fs::current_path() : static_cast<fs::path>(argv[1]);
+  for (const auto &entry : fs::directory_iterator(curFolder)) {
     if (entry.path().has_extension() && entry.path().extension() == ".pdf") { allPdfFiles.emplace_back(entry.path().string()); } }
   for (const auto &currentPdf : allPdfFiles) { futures.emplace_back(std::async(std::launch::async, optimizePdf, currentPdf)); }
   for (auto &future : futures) { future.get(); }
