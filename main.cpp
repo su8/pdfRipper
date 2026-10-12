@@ -26,15 +26,17 @@ MA 02110-1301, USA.
 
 static void optimizePdf(const std::string &pdfPath);
 
+int mustComplete = 1;
+int completed = 0;
+std::vector<std::string> allPdfFiles;
 namespace fs = std::filesystem;
 
 int main(int argc, char *argv[]) {
   if (argc < 2) { std::cerr << "You must provide folder with *pdf file(s) in it. Exiting." << std::endl; return EXIT_FAILURE; }
-  std::vector<std::string> allPdfFiles;
   std::vector<std::future<void>> futures;
   fs::path curFolder = (argv[1][0] == '.') ? fs::current_path() : static_cast<fs::path>(argv[1]);
   for (const auto &entry : fs::directory_iterator(curFolder.string())) {
-    if (entry.path().has_extension() && entry.path().extension() == ".pdf") { allPdfFiles.emplace_back(entry.path().string()); } }
+    if (entry.path().has_extension() && entry.path().extension() == ".pdf") { allPdfFiles.emplace_back(entry.path().string()); mustComplete++; } }
   for (const auto &currentPdf : allPdfFiles) { futures.emplace_back(std::async(std::launch::async, optimizePdf, currentPdf)); }
   for (auto &future : futures) { future.get(); }
   return EXIT_SUCCESS;
@@ -56,11 +58,17 @@ static void optimizePdf(const std::string &pdfPath) {
   if ((fs::exists(outPath) && fs::is_regular_file(outPath)) ||
     (fs::exists(static_cast<fs::path>(checkIfConverted)) && fs::is_regular_file(static_cast<fs::path>(checkIfConverted)))) {
       std::cout << fs::current_path().string() << SEP << outPath.filename().string() << " already exists. Nothing to be done." << std::endl; return; }
-  char params[4096] = GS " -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dQUIET -dCompatibilityLevel=1.7 -dCompressFonts=true -dSubsetFonts=true -dPDFSETTINGS=/printer -sBandListStorage=memory -dBufferSpace=99000 -dNumRenderingThreads=8 -dMaxPatternBitmap=2000000 -sOutputFile=";
+  char params[5000] = GS " -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dQUIET -dCompatibilityLevel=1.7 -dCompressFonts=true -dSubsetFonts=true -dPDFSETTINGS=/printer -sBandListStorage=memory -dBufferSpace=99000 -dNumRenderingThreads=8 -dMaxPatternBitmap=2000000 -sOutputFile=";
   snprintf(params, sizeof(params), "%s%s %s", params, outPath.filename().string().c_str(), pdfPath.c_str());
   try {
+    auto originalSize = fs::file_size(pdfPath);
     std::cout << "Please wait until we convert the requested " << pdfPath << " file." << std::endl;
     std::system(params);
+    completed++;
+    std::cout << "[" << completed << "/" << allPdfFiles.size() << "] " << outPath.filename() << " done\n";
+    auto optimizedSize = fs::file_size(outPath);
+    double ratio = (1.0 - static_cast<double>(optimizedSize / originalSize)) * 100.0;
     std::cout << outPath.filename().string() << " done." << std::endl;
+    std::cout << outPath.filename() << " saved " << ratio << "%\n";
   } catch (const std::exception &e) { std::cerr << "Error: " << e.what() << std::endl; return; }
 }
